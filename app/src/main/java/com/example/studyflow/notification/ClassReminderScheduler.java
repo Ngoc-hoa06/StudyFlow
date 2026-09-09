@@ -26,24 +26,17 @@ public class ClassReminderScheduler {
         int minute =
                 Integer.parseInt(timeParts[1]);
 
-        Calendar calendar =
-                Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance();
+        boolean dateSpecific = schedule.getDateMillis() > 0L;
 
-        int today =
-                calendar.get(Calendar.DAY_OF_WEEK);
-
-        int targetDay =
-                convertToCalendarDay(
-                        schedule.getDayOfWeek()
-                );
-
-        int daysUntil =
-                (targetDay - today + 7) % 7;
-
-        calendar.add(
-                Calendar.DAY_OF_YEAR,
-                daysUntil
-        );
+        if (dateSpecific) {
+            calendar.setTimeInMillis(schedule.getDateMillis());
+        } else {
+            int today = calendar.get(Calendar.DAY_OF_WEEK);
+            int targetDay = convertToCalendarDay(schedule.getDayOfWeek());
+            int daysUntil = (targetDay - today + 7) % 7;
+            calendar.add(Calendar.DAY_OF_YEAR, daysUntil);
+        }
 
         calendar.set(
                 Calendar.HOUR_OF_DAY,
@@ -70,13 +63,9 @@ public class ClassReminderScheduler {
                 -schedule.getReminderMinutes()
         );
 
-        if (calendar.getTimeInMillis()
-                <= System.currentTimeMillis()) {
-
-            calendar.add(
-                    Calendar.DAY_OF_YEAR,
-                    7
-            );
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            if (dateSpecific) return;
+            calendar.add(Calendar.DAY_OF_YEAR, 7);
         }
 
         Intent intent =

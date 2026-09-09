@@ -12,6 +12,7 @@ import com.example.studyflow.data.entity.*;
 import com.example.studyflow.focus.*;
 import com.example.studyflow.ui.common.*;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.material.card.MaterialCardView;
 import java.util.*;
 
 public class HomeFragment extends DataFragment {
@@ -31,13 +32,13 @@ public class HomeFragment extends DataFragment {
         super.onViewCreated(v,saved);
         String uid=FirebaseAuth.getInstance().getUid();
         if(uid!=null)new com.example.studyflow.data.repository.UserProfileRepository().getUserProfile(uid,
-            new com.example.studyflow.data.repository.UserProfileRepository.OnProfileLoadedListener(){
-                public void onSuccess(com.example.studyflow.data.model.UserProfile profile){
-                    if(getView()!=null&&profile!=null&&profile.getName()!=null){profileName=profile.getName();refresh();}
-                }
-                public void onNotFound(){}
-                public void onFailure(Exception e){}
-            });
+                new com.example.studyflow.data.repository.UserProfileRepository.OnProfileLoadedListener(){
+                    public void onSuccess(com.example.studyflow.data.model.UserProfile profile){
+                        if(getView()!=null&&profile!=null&&profile.getName()!=null){profileName=profile.getName();refresh();}
+                    }
+                    public void onNotFound(){}
+                    public void onFailure(Exception e){}
+                });
         FocusController.get(requireContext()).observe().observe(getViewLifecycleOwner(),this::timer);
         focusHandler.removeCallbacks(focusTicker);
         focusHandler.post(focusTicker);
@@ -106,10 +107,15 @@ public class HomeFragment extends DataFragment {
                 cell.setBackground(Ui.background(requireContext(),Ui.startOfDay(date.getTimeInMillis())==Ui.startOfDay(System.currentTimeMillis())?Ui.LINE:0xFFFBFCFF,6));
                 week.addView(cell,new LinearLayout.LayoutParams(0,-2,1));TextView number=Ui.text(cell,String.valueOf(date.get(Calendar.DAY_OF_MONTH)),14,true);
                 if(date.get(Calendar.MONTH)!=month.get(Calendar.MONTH))number.setTextColor(Ui.MUTED);
-                for(ClassSchedule s:schedules){if(s.getDayOfWeek()!=Ui.day(date))continue;Course c=course(s.getCourseId());if(c==null)continue;
-                    TextView event=Ui.text(cell,c.getCourseName()+"\n"+s.getStartTime()+" – "+s.getEndTime(),12,true);event.setPadding(6,8,6,8);event.setMinHeight(Ui.dp(requireContext(),48));event.setBackground(Ui.background(requireContext(),Ui.color(c),6));event.setFocusable(true);
+                // A class session belongs to one concrete date. Do not match by
+                // weekday, otherwise a Wednesday session would repeat every week.
+                for(ClassSchedule s:schedules){
+                    if(s.getDateMillis()<=0L||Ui.startOfDay(s.getDateMillis())!=Ui.startOfDay(date.getTimeInMillis()))continue;
+                    Course c=course(s.getCourseId());if(c==null)continue;
+                    MaterialCardView event=new MaterialCardView(requireContext());event.setRadius(Ui.dp(requireContext(),6));event.setCardElevation(0);event.setCardBackgroundColor(Ui.color(c));event.setContentDescription(c.getCourseName()+", "+s.getStartTime()+" to "+s.getEndTime());event.setFocusable(true);
                     event.setOnClickListener(v->new AlertDialog.Builder(requireContext()).setTitle("Class details")
-                        .setMessage("Course: "+c.getCourseName()+"\nTeacher: "+c.getLecturer()+"\nRoom: "+Ui.room(c,s)+"\nDate: "+new java.text.SimpleDateFormat("dd/MM/yyyy",Locale.US).format(selected.getTime())+"\nTime: "+s.getStartTime()+" – "+s.getEndTime()).setPositiveButton("Close",null).show());
+                            .setMessage("Course: "+c.getCourseName()+"\nTeacher: "+c.getLecturer()+"\nRoom: "+Ui.room(c,s)+"\nDate: "+new java.text.SimpleDateFormat("dd/MM/yyyy",Locale.US).format(selected.getTime())+"\nTime: "+s.getStartTime()+" – "+s.getEndTime()).setPositiveButton("Close",null).show());
+                    LinearLayout.LayoutParams eventParams=new LinearLayout.LayoutParams(-1,Ui.dp(requireContext(),32));eventParams.topMargin=Ui.dp(requireContext(),4);cell.addView(event,eventParams);
                 }
             }
         }

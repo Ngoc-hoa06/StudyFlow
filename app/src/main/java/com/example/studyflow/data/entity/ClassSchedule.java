@@ -2,8 +2,10 @@ package com.example.studyflow.data.entity;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+import androidx.room.ColumnInfo;
 
 @Entity(
         tableName = "class_schedules",
@@ -21,6 +23,12 @@ public class ClassSchedule {
     private int scheduleId;
 
     private int courseId;
+    /**
+     * The calendar day for this one-time class session, stored at local midnight.
+     * A value of zero is kept only for schedules created by older app versions.
+     */
+    @ColumnInfo(defaultValue = "0")
+    private long dateMillis;
     private int dayOfWeek;
     private String startTime;
     private String endTime;
@@ -35,11 +43,30 @@ public class ClassSchedule {
                          int reminderMinutes) {
 
         this.courseId = courseId;
+        this.dateMillis = 0L;
         this.dayOfWeek = dayOfWeek;
         this.startTime = startTime;
         this.endTime = endTime;
         this.room = room;
         this.reminderMinutes = reminderMinutes;
+    }
+
+    /** Creates a date-specific class session. */
+    @Ignore
+    public ClassSchedule(int courseId,
+                         long dateMillis,
+                         String startTime,
+                         String endTime,
+                         String room,
+                         int reminderMinutes) {
+        this(courseId, dayOfWeek(dateMillis), startTime, endTime, room, reminderMinutes);
+        this.dateMillis = dateMillis;
+    }
+
+    private static int dayOfWeek(long millis) {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.setTimeInMillis(millis);
+        return (calendar.get(java.util.Calendar.DAY_OF_WEEK) + 5) % 7 + 1;
     }
 
     public int getScheduleId() {
@@ -56,6 +83,14 @@ public class ClassSchedule {
 
     public void setCourseId(int courseId) {
         this.courseId = courseId;
+    }
+
+    public long getDateMillis() {
+        return dateMillis;
+    }
+
+    public void setDateMillis(long dateMillis) {
+        this.dateMillis = dateMillis;
     }
 
     public int getDayOfWeek() {

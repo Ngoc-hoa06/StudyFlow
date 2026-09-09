@@ -25,7 +25,7 @@ import com.example.studyflow.data.entity.Task;
                 StudyPlan.class,
                 FocusSession.class
         },
-        version = 3,
+        version = 4,
         exportSchema = false
 )
 public abstract class StudyFlowDatabase extends RoomDatabase {
@@ -64,6 +64,13 @@ public abstract class StudyFlowDatabase extends RoomDatabase {
                 }
             };
 
+    public static final androidx.room.migration.Migration MIGRATION_3_4 =
+            new androidx.room.migration.Migration(3, 4) {
+                @Override public void migrate(@androidx.annotation.NonNull androidx.sqlite.db.SupportSQLiteDatabase db) {
+                    db.execSQL("ALTER TABLE class_schedules ADD COLUMN dateMillis INTEGER NOT NULL DEFAULT 0");
+                }
+            };
+
     private static volatile StudyFlowDatabase INSTANCE;
 
     public abstract CourseDao courseDao();
@@ -88,11 +95,35 @@ public abstract class StudyFlowDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             StudyFlowDatabase.class,
                             "studyflow_database"
-                    ).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build();
+                    ).addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build();
+                    normalizeLegacySchedules(INSTANCE);
                 }
             }
         }
 
         return INSTANCE;
+    }
+
+    /**
+     * Older releases stored only a weekday, which made a class appear every week.
+     * Give those rows one concrete upcoming date so they become one-time sessions.
+     */
+    private static void normalizeLegacySchedules(final StudyFlowDatabase database) {
+        IO.execute(() -> {
+            java.util.Calendar today = java.util.Calendar.getInstance();
+            int currentDay = (today.get(java.util.Calendar.DAY_OF_WEEK) + 5) % 7 + 1;
+            for (com.example.studyflow.data.entity.ClassSchedule schedule : database.classScheduleDao().getSnapshot()) {
+                if (schedule.getDateMillis() != 0L) continue;
+                java.util.Calendar target = (java.util.Calendar) today.clone();
+                int delta = (schedule.getDayOfWeek() - currentDay + 7) % 7;
+                target.add(java.util.Calendar.DAY_OF_YEAR, delta);
+                target.set(java.util.Calendar.HOUR_OF_DAY, 0);
+                target.set(java.util.Calendar.MINUTE, 0);
+                target.set(java.util.Calendar.SECOND, 0);
+                target.set(java.util.Calendar.MILLISECOND, 0);
+                schedule.setDateMillis(target.getTimeInMillis());
+                database.classScheduleDao().update(schedule);
+            }
+        });
     }
 }

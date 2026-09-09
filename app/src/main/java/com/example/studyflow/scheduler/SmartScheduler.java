@@ -46,7 +46,7 @@ public final class SmartScheduler {
         for(int offset=0;offset<HORIZON_DAYS;offset++,day.add(Calendar.DAY_OF_YEAR,1)){
             Calendar end=(Calendar)day.clone();end.add(Calendar.DAY_OF_YEAR,1);
             List<long[]> busy=new ArrayList<>();int capacity=DAILY_CAPACITY;
-            for(ClassSchedule s:classes)if(s.getDayOfWeek()==(day.get(Calendar.DAY_OF_WEEK)+5)%7+1){
+            for(ClassSchedule s:classes)if(matchesDate(s,day)){
                 try{busy.add(new long[]{at(day,parse(s.getStartTime())),at(day,parse(s.getEndTime()))});}catch(Exception ignored){out.warnings.add("An invalid class time was found. Check your Schedule.");}
             }
             for(StudyPlan p:existing)if(p.getStudyDate()>=day.getTimeInMillis()&&p.getStudyDate()<end.getTimeInMillis()&&p.getCompletedMinutes()>0){
@@ -77,11 +77,15 @@ public final class SmartScheduler {
     private static int parse(String s){String[]p=s.split(":");int h=Integer.parseInt(p[0]),m=Integer.parseInt(p[1]);if(h<0||h>23||m<0||m>59)throw new IllegalArgumentException();return h*60+m;}
     private static long at(Calendar day,int minute){Calendar c=(Calendar)day.clone();c.set(Calendar.HOUR_OF_DAY,minute/60);c.set(Calendar.MINUTE,minute%60);return c.getTimeInMillis();}
     public static long startOfDay(long time){Calendar c=Calendar.getInstance();c.setTimeInMillis(time);c.set(Calendar.HOUR_OF_DAY,0);c.set(Calendar.MINUTE,0);c.set(Calendar.SECOND,0);c.set(Calendar.MILLISECOND,0);return c.getTimeInMillis();}
+    private static boolean matchesDate(ClassSchedule schedule,Calendar day){
+        if(schedule.getDateMillis()>0L)return startOfDay(schedule.getDateMillis())==startOfDay(day.getTimeInMillis());
+        return schedule.getDayOfWeek()==(day.get(Calendar.DAY_OF_WEEK)+5)%7+1;
+    }
     /** Full input fingerprint, stable even if query ordering changes. */
     public static String fingerprint(List<Task> tasks,List<ClassSchedule> classes,List<FocusSession> history,List<StudyPlan> plans){
         List<String> rows=new ArrayList<>();
         for(Task t:tasks)rows.add("T|"+t.getTaskId()+"|"+t.getCourseId()+"|"+t.getTitle()+"|"+t.getDeadline()+"|"+t.getPriority()+"|"+t.getEstimatedMinutes()+"|"+t.getCompletedMinutes()+"|"+t.getStatus());
-        for(ClassSchedule s:classes)rows.add("C|"+s.getScheduleId()+"|"+s.getDayOfWeek()+"|"+s.getStartTime()+"|"+s.getEndTime());
+        for(ClassSchedule s:classes)rows.add("C|"+s.getScheduleId()+"|"+s.getDateMillis()+"|"+s.getDayOfWeek()+"|"+s.getStartTime()+"|"+s.getEndTime());
         for(FocusSession f:history)rows.add("F|"+f.getSessionId()+"|"+f.getStartTime()+"|"+f.getDurationMinutes());
         for(StudyPlan p:plans)rows.add("P|"+p.getPlanId()+"|"+p.getTaskId()+"|"+p.getStudyDate()+"|"+p.getPlannedMinutes()+"|"+p.getCompletedMinutes()+"|"+p.getStatus());
         Collections.sort(rows);return rows.toString();

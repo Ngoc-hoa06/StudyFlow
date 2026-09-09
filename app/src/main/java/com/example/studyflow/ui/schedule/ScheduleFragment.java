@@ -1,5 +1,6 @@
 package com.example.studyflow.ui.schedule;
 
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.text.InputType;
 import android.widget.*;
@@ -11,32 +12,21 @@ import com.example.studyflow.ui.common.*;
 import java.util.*;
 
 public class ScheduleFragment extends DataFragment {
-    private int selectedDay=Ui.day(Calendar.getInstance());
-    private static final List<String> DAYS=Arrays.asList("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday");
+    private long selectedDate=Ui.startOfDay(System.currentTimeMillis());
     @Override protected void render(){
         Ui.heading(body,"Schedule",R.drawable.ic_sf_schedule);
-        Ui.text(body,"Your recurring weekly class schedule",14,false);
+        Ui.text(body,"Plan one-time class sessions by date",14,false);
         LinearLayout actions=Ui.row(requireContext());body.addView(actions);
         Ui.weight(Ui.button(actions,"+ Course",()->editCourse(null)));
         Ui.weight(Ui.button(actions,"+ Class session",()->editSchedule(null)));
         LinearLayout calendar=Ui.card(body);
-        HorizontalScrollView weekScroll=new HorizontalScrollView(requireContext());
-        LinearLayout weekdays=Ui.row(requireContext());weekScroll.addView(weekdays);calendar.addView(weekScroll);
-        for(int i=0;i<7;i++){
-            final int dayNumber=i+1;
-            com.google.android.material.button.MaterialButton tab=Ui.button(weekdays,DAYS.get(i),()->{selectedDay=dayNumber;refresh();});
-            tab.setMinWidth(0);
-            tab.setMinHeight(Ui.dp(requireContext(),48));
-            tab.setTextSize(12);
-            tab.setSingleLine(true);
-            tab.setEllipsize(null);
-            tab.setPadding(Ui.dp(requireContext(),6),0,Ui.dp(requireContext(),6),0);
-            tab.setLayoutParams(new LinearLayout.LayoutParams(Ui.dp(requireContext(),86),Ui.dp(requireContext(),52)));
-            if(selectedDay==dayNumber){tab.setTextColor(android.graphics.Color.WHITE);tab.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Ui.BLUE));}
-        }
-        List<ClassSchedule> list=new ArrayList<>();for(ClassSchedule s:schedules)if(s.getDayOfWeek()==selectedDay)list.add(s);
+        com.google.android.material.button.MaterialButton dateButton=Ui.button(calendar,"Date: "+formatDate(selectedDate),this::pickDate);
+        dateButton.setContentDescription("Choose class date");
+        List<ClassSchedule> list=new ArrayList<>();
+        for(ClassSchedule s:schedules)
+            if(s.getDateMillis()>0L&&Ui.startOfDay(s.getDateMillis())==selectedDate)list.add(s);
         list.sort(Comparator.comparing(ClassSchedule::getStartTime));
-        if(list.isEmpty())Ui.text(calendar,"No classes scheduled for this day.",15,false);
+        if(list.isEmpty())Ui.text(calendar,"No classes scheduled for this date.",15,false);
         for(ClassSchedule s:list){
             Course c=course(s.getCourseId());if(c==null)continue;
             Ui.text(calendar,s.getStartTime()+" – "+s.getEndTime(),13,true);
@@ -91,7 +81,14 @@ public class ScheduleFragment extends DataFragment {
         List<Course> options=new ArrayList<>(courses);List<String> names=new ArrayList<>();int selected=0;
         for(int i=0;i<options.size();i++){names.add(options.get(i).getCourseName());if(old!=null&&options.get(i).getCourseId()==old.getCourseId())selected=i;}
         LinearLayout form=Ui.column(requireContext());Spinner coursePicker=Ui.spinner(form,"Course",names,selected);
-        Spinner day=Ui.spinner(form,"Day",DAYS,old==null?selectedDay-1:old.getDayOfWeek()-1);
+        Calendar classDate=Calendar.getInstance();
+        classDate.setTimeInMillis(old!=null&&old.getDateMillis()>0L?old.getDateMillis():old==null?selectedDate:nextDateForDay(old.getDayOfWeek()));
+        EditText date=Ui.input(form,"Class date (dd/MM/yyyy)",formatDate(classDate.getTimeInMillis()),InputType.TYPE_CLASS_DATETIME);
+        date.setFocusable(false);date.setOnClickListener(v->new DatePickerDialog(requireContext(),(picker,year,month,day)->{
+            classDate.set(Calendar.YEAR,year);classDate.set(Calendar.MONTH,month);classDate.set(Calendar.DAY_OF_MONTH,day);
+            classDate.set(Calendar.HOUR_OF_DAY,0);classDate.set(Calendar.MINUTE,0);classDate.set(Calendar.SECOND,0);classDate.set(Calendar.MILLISECOND,0);
+            date.setText(formatDate(classDate.getTimeInMillis()));
+        },classDate.get(Calendar.YEAR),classDate.get(Calendar.MONTH),classDate.get(Calendar.DAY_OF_MONTH)).show());
         EditText start=Ui.input(form,"Start time (HH:mm)",old==null?"08:00":old.getStartTime(),InputType.TYPE_CLASS_DATETIME);
         EditText end=Ui.input(form,"End time (HH:mm)",old==null?"10:00":old.getEndTime(),InputType.TYPE_CLASS_DATETIME);
         timePicker(start);timePicker(end);
@@ -107,20 +104,39 @@ public class ScheduleFragment extends DataFragment {
                 int from=Ui.minutes(Ui.value(start)),to=Ui.minutes(Ui.value(end));if(from>=to)throw new IllegalArgumentException("Start time must be earlier than end time.");
                 if(override.isChecked()&&Ui.value(room).isEmpty())throw new IllegalArgumentException("Enter an override room or disable the option.");
                 Course c=options.get(coursePicker.getSelectedItemPosition());
-                ClassSchedule s=new ClassSchedule(c.getCourseId(),day.getSelectedItemPosition()+1,Ui.time(from),Ui.time(to),override.isChecked()?Ui.value(room):"",30);
+                classDate.set(Calendar.HOUR_OF_DAY,0);classDate.set(Calendar.MINUTE,0);classDate.set(Calendar.SECOND,0);classDate.set(Calendar.MILLISECOND,0);
+                long dateMillis=classDate.getTimeInMillis();
+                ClassSchedule s=new ClassSchedule(c.getCourseId(),dateMillis,Ui.time(from),Ui.time(to),override.isChecked()?Ui.value(room):"",30);
                 if(old!=null)s.setScheduleId(old.getScheduleId());android.content.Context ctx=requireContext().getApplicationContext();
                 dialog.getButton(-1).setEnabled(false);
                 write(()->{
                     db.runInTransaction(()->{
                         for(ClassSchedule other:db.classScheduleDao().getSnapshot())
-                            if(other.getScheduleId()!=s.getScheduleId()&&other.getDayOfWeek()==s.getDayOfWeek()&&from<Ui.minutes(other.getEndTime())&&to>Ui.minutes(other.getStartTime()))
+                            if(other.getScheduleId()!=s.getScheduleId()&&other.getDateMillis()>0L&&Ui.startOfDay(other.getDateMillis())==dateMillis&&from<Ui.minutes(other.getEndTime())&&to>Ui.minutes(other.getStartTime()))
                                 throw new IllegalArgumentException("This overlaps with "+other.getStartTime()+" – "+other.getEndTime()+". Choose another time.");
                         if(old==null)s.setScheduleId((int)db.classScheduleDao().insert(s));else db.classScheduleDao().update(s);
                     });
                     if(old!=null)ClassReminderScheduler.cancel(ctx,old);ClassReminderScheduler.scheduleReminder(ctx,c,s);
-                },null);dialog.dismiss();
+                },null);selectedDate=dateMillis;dialog.dismiss();
             }catch(Exception ex){error.setText(ex.getMessage());}
         }));dialog.show();
     }
+    private void pickDate(){
+        Calendar initial=Calendar.getInstance();initial.setTimeInMillis(selectedDate);
+        new DatePickerDialog(requireContext(),(picker,year,month,day)->{
+            Calendar chosen=Calendar.getInstance();chosen.set(year,month,day,0,0,0);chosen.set(Calendar.MILLISECOND,0);
+            selectedDate=chosen.getTimeInMillis();refresh();
+        },initial.get(Calendar.YEAR),initial.get(Calendar.MONTH),initial.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private long nextDateForDay(int dayOfWeek){
+        Calendar target=Calendar.getInstance();
+        int current=Ui.day(target);
+        target.add(Calendar.DAY_OF_YEAR,(dayOfWeek-current+7)%7);
+        target.set(Calendar.HOUR_OF_DAY,0);target.set(Calendar.MINUTE,0);target.set(Calendar.SECOND,0);target.set(Calendar.MILLISECOND,0);
+        return target.getTimeInMillis();
+    }
+
+    private String formatDate(long millis){return new java.text.SimpleDateFormat("dd/MM/yyyy",Locale.US).format(new Date(millis));}
     private void timePicker(EditText field){field.setFocusable(false);field.setOnClickListener(v->{int m;try{m=Ui.minutes(Ui.value(field));}catch(Exception e){m=480;}new TimePickerDialog(requireContext(),(p,h,min)->field.setText(Ui.time(h*60+min)),m/60,m%60,true).show();});}
 }
