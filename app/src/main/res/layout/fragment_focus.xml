@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F1F8E9"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="30dp">
+
+        <!-- HEADER -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Focus"
+            android:textColor="#17210F"
+            android:textSize="29sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="One task at a time. Make every minute count."
+            android:textColor="#66705E"
+            android:textSize="14sp" />
+
+
+        <!-- TASK SELECTION -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#DCEDC8"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CURRENT SESSION"
+                    android:textColor="#689F38"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:text="What are you working on?"
+                    android:textColor="#17210F"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerFocusTask"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="#558B2F" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- TIMER HERO CARD -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="#33691E"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="28dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="28dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="FOCUS MODE"
+                    android:textColor="#AED581"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Stay in your flow"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+
+                <!-- TIMER CIRCLE -->
+                <ProgressBar
+                    android:id="@+id/focusProgressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="6dp"
+                    android:layout_marginTop="24dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#9CCC65"
+                    android:progressBackgroundTint="#558B2F" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="260dp"
+                    android:layout_height="260dp"
+                    android:layout_marginTop="25dp"
+                    app:cardBackgroundColor="#558B2F"
+                    app:cardCornerRadius="130dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#8BC34A"
+                    app:strokeWidth="5dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TIME REMAINING"
+                            android:textColor="#C5E1A5"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTimer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="sans-serif-light"
+                            android:text="25:00"
+                            android:textColor="#FFFFFF"
+                            android:textSize="55sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="Keep going, you've got this."
+                            android:textColor="#C5E1A5"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- DURATION -->
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="26dp"
+                    android:text="Session duration"
+                    android:textColor="#C5E1A5"
+                    android:textSize="12sp" />
+
+                <Spinner
+                    android:id="@+id/spinnerFocusDuration"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:backgroundTint="#AED581" />
+
+
+                <!-- START -->
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartFocus"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="22dp"
+                    android:text="Start Focus"
+                    android:textAllCaps="false"
+                    android:textColor="#33691E"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#9CCC65"
+                    app:cornerRadius="18dp" />
+
+
+                <!-- PAUSE / RESET -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnPauseFocus"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:enabled="false"
+                        android:text="Pause"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#558B2F"
+                        app:cornerRadius="16dp"
+                        app:strokeColor="#8BC34A"
+                        app:strokeWidth="1dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetFocus"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:text="Reset"
+                        android:textAllCaps="false"
+                        android:textColor="#FFFFFF"
+                        app:backgroundTint="#558B2F"
+                        app:cornerRadius="16dp"
+                        app:strokeColor="#8BC34A"
+                        app:strokeWidth="1dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- MOTIVATION CARD -->
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            app:cardBackgroundColor="#DCEDC8"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="A little progress every day"
+                    android:textColor="#33691E"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Complete your focus session to update your task progress and build a consistent study habit."
+                    android:textColor="#558B2F"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>

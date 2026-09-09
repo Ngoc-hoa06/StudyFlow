@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <Spinner
+            android:id="@+id/spinnerDay"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <Button
+            android:id="@+id/btnStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:text="Select start time" />
+
+        <Button
+            android:id="@+id/btnEndTime"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:text="Select end time" />
+
+        <EditText
+            android:id="@+id/etScheduleRoom"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Room"
+            android:inputType="text"
+            android:importantForAutofill="no" />
+
+        <EditText
+            android:id="@+id/etReminderMinutes"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Reminder before class (minutes)"
+            android:inputType="number"
+            android:text="30"
+            android:importantForAutofill="no" />
+
+    </LinearLayout>
+
+</ScrollView>

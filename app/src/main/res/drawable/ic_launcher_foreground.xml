@@ -1,0 +1,7 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/studyflow_logo"
+        android:gravity="center"
+        android:width="82dp"
+        android:height="82dp" />
+</layer-list>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <style name="StudyFlowBottomNavigationIndicator">
+        <item name="android:color">@color/bottom_nav_indicator</item>
+        <item name="shapeAppearance">
+            @style/StudyFlowBottomNavigationIndicatorShape
+        </item>
+    </style>
+
+    <style name="StudyFlowBottomNavigationIndicatorShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="StudyFlowBottomNavigationText"
+        parent="TextAppearance.MaterialComponents.Caption">
+
+        <item name="android:textSize">11sp</item>
+
+    </style>
+
+</resources>

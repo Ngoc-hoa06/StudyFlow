@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Course" />
+
+        <Spinner
+            android:id="@+id/spinnerCourse"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <EditText
+            android:id="@+id/etTaskTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Task title"
+            android:inputType="textCapSentences" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Task type" />
+
+        <Spinner
+            android:id="@+id/spinnerTaskType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Deadline" />
+
+        <Button
+            android:id="@+id/btnDeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select deadline" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Priority" />
+
+        <Spinner
+            android:id="@+id/spinnerPriority"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <EditText
+            android:id="@+id/etEstimatedMinutes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Estimated study time (minutes)"
+            android:inputType="number" />
+
+    </LinearLayout>
+
+</ScrollView>

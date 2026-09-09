@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1054490011470",
+    "project_id": "studyflow-0612",
+    "storage_bucket": "studyflow-0612.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054490011470:android:5bd96a96da356176e0e01f",
+        "android_client_info": {
+          "package_name": "com.example.studyflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1054490011470-ocbcueumgo8p0jomto1pidntnd1og0j2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.studyflow",
+            "certificate_hash": "de3eab94bae37b29083bc3f6829c3aa6aa09d64c"
+          }
+        },
+        {
+          "client_id": "1054490011470-9hr6g3g6rhv0u012d0ppa5r94vv5ublb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlXhwHofLYDii9a49ozTYu3PEQFy0ZdV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1054490011470-9hr6g3g6rhv0u012d0ppa5r94vv5ublb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

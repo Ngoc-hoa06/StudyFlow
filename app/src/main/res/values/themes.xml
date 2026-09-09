@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Base.Theme.StudyFlow"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="colorPrimary">#304FFE</item>
+        <item name="colorSecondary">#6554E8</item>
+
+    </style>
+
+    <style name="Theme.StudyFlow"
+        parent="Base.Theme.StudyFlow" />
+
+</resources>
